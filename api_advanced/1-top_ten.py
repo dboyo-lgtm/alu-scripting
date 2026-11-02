@@ -13,12 +13,21 @@ def top_ten(subreddit):
     """
     url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
     headers = {'User-Agent': 'python:alu.api.advanced:v1.0'}
+    
+    # allow_redirects=False ensures invalid subreddits don't follow search redirects
     response = requests.get(url, headers=headers, allow_redirects=False)
 
     if response.status_code == 200:
-        data = response.json()
-        posts = data.get('data', {}).get('children', [])
-        for post in posts:
-            print(post.get('data', {}).get('title'))
-    else:
-        print(None)
+        try:
+            data = response.json()
+            posts = data.get('data', {}).get('children', [])
+            if not posts:
+                print(None)
+                return
+            for post in posts:
+                print(post.get('data', {}).get('title'))
+            return
+        except ValueError:
+            pass
+            
+    print(None)
